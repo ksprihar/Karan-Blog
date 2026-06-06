@@ -10,3 +10,4 @@ Flask
 SQLAlchemy
 gunicorn
 psycopg-binary
+python-dotenv

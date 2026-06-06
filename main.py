@@ -13,10 +13,11 @@ from typing import List
 from hashlib import md5
 import smtplib
 import os
+from dotenv import load_dotenv
 
 from forms import *
 
-
+load_dotenv()
 my_email = os.environ.get('EMAIL')
 password = os.environ.get('PASSWORD')
 
