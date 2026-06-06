@@ -1,6 +1,8 @@
 from __future__ import annotations
 import os
 import smtplib
+import time
+import requests
 from datetime import datetime
 from functools import wraps
 from typing import List
@@ -12,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()  # Loads variables from .env into os.environ
 
 # Flask and Web Extensions
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, session
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -29,6 +31,7 @@ from forms import PostForm, RegisterForm, LoginForm, CommentForm
 # --- Configuration ---
 MY_EMAIL = os.environ.get('EMAIL')
 EMAIL_PASSWORD = os.environ.get('PASSWORD')
+TURNSTILE_SECRET_KEY = os.environ.get('TURNSTILE_SECRET_KEY')
 
 
 class Base(DeclarativeBase):
@@ -165,6 +168,33 @@ def contact():
             flash("You need to be logged in to contact me.")
             return redirect(url_for('login'))
 
+        # Bot-checks
+        # 1. Time based Validation
+        start_time = session.get('contact_form_start_time', 0)
+        time_taken = time.time() - start_time
+
+        if time_taken < 3.0:
+            flash("Form submitted too quickly. Please take your time.")
+            return redirect(url_for('contact'))
+
+        # Bot-checks
+        # 2. Cloudflare Turnstile
+        # Get the hidden token Cloudflare injects into your form
+        turnstile_token = request.form.get('cf-turnstile-response')
+
+        # Verify that token with Cloudflare's API
+        verify_url = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+        cf_data = {
+            'secret': TURNSTILE_SECRET_KEY,
+            'response': turnstile_token,
+            'remoteip': request.remote_addr
+        }
+        cf_response = requests.post(verify_url, data=cf_data).json()
+
+        if not cf_response['success']:
+            flash("Bot validation failed. Please try again.")
+            return redirect(url_for('contact'))
+
         # Process the form data
         name = request.form['name']
         email = request.form['email']
@@ -177,8 +207,12 @@ def contact():
         return render_template('contact.html', heading=heading)
 
     # Render default GET request
-    heading = "Contact Me"
-    return render_template('contact.html', heading=heading)
+    # Record the exact timestamp the page was loaded into the user's secure session
+    session['contact_form_start_time'] = time.time()
+
+    # Load Turnstile site key to pass to the webpage
+    site_key = os.environ.get('TURNSTILE_SITE_KEY')
+    return render_template('contact.html', heading="Contact Me", site_key=site_key)
 
 
 @app.route('/post/<int:post_id>', methods=['POST', 'GET'])

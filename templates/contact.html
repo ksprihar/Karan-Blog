@@ -28,13 +28,14 @@
         <div class="my-5">
           <!-- * * * * * * * * * * * * * * *-->
           <!-- * * Simplified SB Contact Form for the Tutorial* *-->
-          <!-- TODO: add an "action" and a "method" to link this form to your main.py -->
+          <p class="flash">{{ get_flashed_messages()[0] }}</p>
           <form
             id="contactForm"
             name="sentMessage"
             action="/contact"
             method="post"
           >
+            <div class="cf-turnstile" data-sitekey="{{ site_key }}"></div>
             <div class="form-floating">
               <input
                 class="form-control"
