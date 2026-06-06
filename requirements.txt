@@ -1,0 +1,12 @@
+Flask-SQLAlchemy
+Flask-WTF
+bootstrap-flask
+flask-ckeditor
+Flask-Gravatar
+Flask_Login
+Werkzeug
+WTForms
+Flask
+SQLAlchemy
+gunicorn
+psycopg-binary

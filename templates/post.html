@@ -1,0 +1,61 @@
+{% include "header.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+    <!-- Page Header-->
+    <header class="masthead" style="background-image: url('{{ post.img_url }}')">
+        <div class="container position-relative px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="post-heading">
+                        <h1>{{ post['title'] }}</h1>
+                        <h2 class="subheading">{{ post['subtitle'] }}</h2>
+                        <span class="meta">
+                            Posted by
+                            <a href="#!">{{ post.author.name }}</a>
+                            on {{ post.date }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Post Content-->
+    <article class="mb-4">
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <p>{{ post.body|safe }}
+                    </p>
+                    {% if current_user.id == 1 %}
+                    <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('edit_post', post_id=post.id) }}">EDIT POST</a></div>
+                    {% endif %}
+                    <!-- TODO: Add a CKEditor for commenting below -->
+        <div class="comment">
+            {{ render_form(form, novalidate=True) }}
+            {{ ckeditor.load() }}
+            {{ ckeditor.config(name="comment") }}
+            <hr>
+          <!-- TODO: Show all the comments on a post -->
+          <ul class="commentList">
+              {% for comment in post.comments %}
+            <li>
+              <div class="commenterImage">
+                <img src="{{comment.user.avatar()}}" />
+              </div>
+              <div class="commentText">
+                <p>{{ comment.comment | safe }}</p>
+                <span class="date sub-text">{{ comment.user.name }}</span>
+              </div>
+            </li>
+              <hr>
+              {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+
+    <!-- Footer-->
+{% include "footer.html" %}
+
