@@ -12,15 +12,13 @@ from functools import wraps
 from typing import List
 from hashlib import md5
 import smtplib
+import os
 
 from forms import *
 
-# blog_api = "https://api.npoint.io/1381cfb1195009418878"
-my_email = "karanparihar81@gmail.com"
-password = "argcdtzlmhvfwkay"
-# response = requests.get(blog_api)
-# response.raise_for_status()
-# posts_json = response.json()
+
+my_email = os.environ.get('EMAIL')
+password = os.environ.get('PASSWORD')
 
 class Base(DeclarativeBase):
     pass
@@ -50,9 +48,8 @@ def admin_only(func):
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
-app.config['SECRET_KEY'] = 'Badboyz@007'
-app.config['CKEDITOR_PKG_TYPE'] = 'full'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///posts.db")
+app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
 db = SQLAlchemy(app, model_class=Base)
 bootstrap = Bootstrap5(app)
 ckeditor = CKEditor(app)
@@ -245,4 +242,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
