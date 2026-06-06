@@ -58,7 +58,7 @@ class User(db.Model, UserMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(250))
-    password: Mapped[str] = mapped_column(String(100), nullable=False)
+    password: Mapped[str] = mapped_column(String(500), nullable=False)
 
     # Relationships
     posts: Mapped[List["Post"]] = relationship("Post", back_populates="author")
