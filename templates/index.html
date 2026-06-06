@@ -42,6 +42,7 @@
 
                 <!-- Pager-->
                 {% if current_user.id == 1 %}
+                    <hr class="my-4" />
                     <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('new_post') }}">CREATE NEW POST</a></div>
                 {% endif %}
             </div>
